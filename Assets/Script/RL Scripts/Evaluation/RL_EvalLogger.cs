@@ -3,7 +3,9 @@ using System.IO;
 using System.Text;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEngine;
+using static System.FormattableString;
 
 /// <summary>
 /// Comprehensive Evaluation & Metrics Logger for RL Combat Testing.
@@ -354,10 +356,10 @@ public class RL_EvalLogger : MonoBehaviour
             MeanEncirclement = meanEncirclement
         });
 
-        // Write to CSVs
-        File.AppendAllText(evalCsvPath, $"{episodeCount},{currentEpisodeDamage:F2},{(enemyWon ? 1 : 0)}\n");
+        // Write to CSVs (Invariant: always '.' as decimal separator, regardless of OS locale)
+        File.AppendAllText(evalCsvPath, Invariant($"{episodeCount},{currentEpisodeDamage:F2},{(enemyWon ? 1 : 0)}\n"));
         string outcomeStr = enemyWon ? "EnemyWon" : "PlayerWon";
-        File.AppendAllText(metricsCsvPath, $"{episodeCount},{outcomeStr},{duration:F2},{episodeStepCount},{currentEpisodeDamage:F2},{meanEncirclement:F1},{meanDist:F2}\n");
+        File.AppendAllText(metricsCsvPath, Invariant($"{episodeCount},{outcomeStr},{duration:F2},{episodeStepCount},{currentEpisodeDamage:F2},{meanEncirclement:F1},{meanDist:F2}\n"));
 
         Debug.Log($"[RL_EvalLogger] Ep {episodeCount} | {(enemyWon ? "VICTORY" : "DEFEAT")} | Dmg: {currentEpisodeDamage:F1} HP | TTK: {duration:F2}s ({episodeStepCount} steps) | Encirclement: {meanEncirclement:F1}°");
 
@@ -391,22 +393,22 @@ public class RL_EvalLogger : MonoBehaviour
         sb.AppendLine("===============================================================================");
         sb.AppendLine($"         RL COMBAT QUANTITATIVE EVALUATION REPORT [{runLabel}]");
         sb.AppendLine("===============================================================================");
-        sb.AppendLine($"  Date & Time           : {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+        sb.AppendLine(Invariant($"  Date & Time           : {DateTime.Now:yyyy-MM-dd HH:mm:ss}"));
         sb.AppendLine($"  Total Episodes Tested : {episodeCount}");
         sb.AppendLine("-------------------------------------------------------------------------------");
         sb.AppendLine("  1. MATCH OUTCOMES & WIN RATES");
-        sb.AppendLine($"     - Enemy Team Wins  : {enemyWins} ({winRate:F1}%)");
-        sb.AppendLine($"     - Player Wins      : {playerWins} ({(float)playerWins / episodeCount * 100f:F1}%)");
+        sb.AppendLine(Invariant($"     - Enemy Team Wins  : {enemyWins} ({winRate:F1}%)"));
+        sb.AppendLine(Invariant($"     - Player Wins      : {playerWins} ({(float)playerWins / episodeCount * 100f:F1}%)"));
         sb.AppendLine("-------------------------------------------------------------------------------");
         sb.AppendLine("  2. COMBAT DURATION & TIME TO KILL (TTK)");
-        sb.AppendLine($"     - Mean Combat Duration : {avgDuration:F2} seconds");
-        sb.AppendLine($"     - Mean Episode Steps   : {(float)episodeStepCount / episodeCount:F1} steps");
+        sb.AppendLine(Invariant($"     - Mean Combat Duration : {avgDuration:F2} seconds"));
+        sb.AppendLine(Invariant($"     - Mean Episode Steps   : {(float)episodeStepCount / episodeCount:F1} steps"));
         sb.AppendLine("-------------------------------------------------------------------------------");
         sb.AppendLine("  3. MULTI-AGENT COORDINATION & ENCIRCLEMENT");
-        sb.AppendLine($"     - Mean Encirclement Span : {avgEncirclement:F1}° (0° = clumped, 240°-360° = surround)");
+        sb.AppendLine(Invariant($"     - Mean Encirclement Span : {avgEncirclement:F1}° (0° = clumped, 240°-360° = surround)"));
         sb.AppendLine("-------------------------------------------------------------------------------");
         sb.AppendLine("  4. DAMAGE EFFICIENCY");
-        sb.AppendLine($"     - Mean Damage to Player  : {avgDamage:F1} HP");
+        sb.AppendLine(Invariant($"     - Mean Damage to Player  : {avgDamage:F1} HP"));
         sb.AppendLine("===============================================================================");
         sb.AppendLine($"  Raw CSV: {evalCsvPath}");
         sb.AppendLine($"  Metrics: {metricsCsvPath}");
@@ -435,7 +437,7 @@ public class RL_EvalLogger : MonoBehaviour
         {
             for (int x = 0; x < gridResolution; x++)
             {
-                sb.Append(matrix[x, z].ToString("F1"));
+                sb.Append(matrix[x, z].ToString("F1", CultureInfo.InvariantCulture));
                 if (x < gridResolution - 1) sb.Append(",");
             }
             sb.Append("\n");
@@ -449,7 +451,7 @@ public class RL_EvalLogger : MonoBehaviour
         sb.AppendLine("AngleStartDeg,AngleEndDeg,ObservationCount");
         for (int i = 0; i < array.Length; i++)
         {
-            sb.AppendLine($"{i * 10},{(i + 1) * 10},{array[i]:F0}");
+            sb.AppendLine(Invariant($"{i * 10},{(i + 1) * 10},{array[i]:F0}"));
         }
         File.WriteAllText(path, sb.ToString());
     }

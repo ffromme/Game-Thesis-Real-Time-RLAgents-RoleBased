@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using UnityEngine;
+using static System.FormattableString;
 
 /// <summary>
 /// Spatial 2D Heatmap & Encirclement Trajectory Tracker.
@@ -231,7 +233,7 @@ public class RL_HeatmapTracker : MonoBehaviour
         {
             for (int x = 0; x < gridResolution; x++)
             {
-                sb.Append(matrix[x, z].ToString("F1"));
+                sb.Append(matrix[x, z].ToString("F1", CultureInfo.InvariantCulture));
                 if (x < gridResolution - 1) sb.Append(",");
             }
             sb.Append("\n");
@@ -245,7 +247,7 @@ public class RL_HeatmapTracker : MonoBehaviour
         sb.AppendLine("AngleStartDeg,AngleEndDeg,ObservationCount");
         for (int i = 0; i < array.Length; i++)
         {
-            sb.AppendLine($"{i * 10},{(i + 1) * 10},{array[i]:F0}");
+            sb.AppendLine(Invariant($"{i * 10},{(i + 1) * 10},{array[i]:F0}"));
         }
         File.WriteAllText(path, sb.ToString());
     }
