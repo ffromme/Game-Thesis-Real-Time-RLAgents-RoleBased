@@ -1,0 +1,43 @@
+# B0 pilot (skripsi Iam): salinan NormalEnemyHCA_NoCurriculum_Softmax_50M.yaml.
+# Beda HANYA max_steps (200k) dan checkpoint_interval (50k, untuk uji --resume).
+# Dipakai untuk mengukur throughput, bukan untuk melatih model yang dievaluasi.
+# Akibat max_steps 200k, learning rate linear turun ke 0 dalam 200k (komentar "50M" di bawah tidak berlaku).
+#
+# Value combination method: Softmax Aggregation
+#
+
+behaviors:
+  NormalEnemy:
+    trainer_type: hca
+    max_steps: 200000
+    checkpoint_interval: 50000
+    time_horizon: 512
+    summary_freq: 20000
+    threaded: false
+
+    hyperparameters:
+      batch_size: 2048
+      buffer_size: 20480
+      learning_rate: 0.0001
+      beta: 0.002              # Low entropy bonus for focused exploitation
+      epsilon: 0.20
+      lambd: 0.95
+      num_epoch: 4
+      learning_rate_schedule: linear   # Linear decay to 0 over 50M steps
+
+      # --- HCA-Specific Hyperparameters ---
+      manager_hidden_units: 128
+      manager_num_layers: 2
+      manager_learning_rate: 0.0001
+      hca_value_method: softmax
+      manager_obs_index: -1
+
+    network_settings:
+      normalize: true
+      hidden_units: 256
+      num_layers: 3
+
+    reward_signals:
+      extrinsic:
+        gamma: 0.99
+        strength: 1.0
