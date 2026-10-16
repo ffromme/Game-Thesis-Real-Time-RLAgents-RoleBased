@@ -71,12 +71,9 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 Assets.zip
-<<<<<<< Updated upstream
 
 # ML-Agents & Unity run logs & training checkpoints
 *.log
 *.pt
 **/run_logs/
 
-=======
->>>>>>> Stashed changes
